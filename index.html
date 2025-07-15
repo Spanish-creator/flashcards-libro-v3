@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Flashcards Libro V3</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f0f0;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      padding: 20px;
+    }
+    .card {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      margin: 10px;
+      width: 280px;
+      text-align: center;
+      padding: 15px;
+    }
+    .card img {
+      max-width: 100%;
+      height: 150px;
+      object-fit: contain;
+      border-radius: 6px;
+    }
+    .text {
+      margin-top: 12px;
+      background: #ffe5b4;
+      padding: 10px;
+      border-radius: 6px;
+      font-size: 1.1em;
+    }
+    button {
+      margin-top: 12px;
+      font-size: 24px;
+      cursor: pointer;
+      background: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 8px 20px;
+      transition: background-color 0.3s ease;
+    }
+    button:hover {
+      background: #45a049;
+    }
+  </style>
+</head>
+<body>
+
+<div class="card">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/d/d3/Soccer_ball_icon.svg" alt="Deporte" />
+  <div class="text">1 Me chifla el deporte.</div>
+  <button onclick="playText('Me chifla el deporte.')">🔊 Escuchar</button>
+</div>
+
+<div class="card">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/5/54/Karate_pictogram.svg" alt="Artes marciales" />
+  <div class="text">2 Me gustan las artes marciales.</div>
+  <button onclick="playText('Me gustan las artes marciales.')">🔊 Escuchar</button>
+</div>
+
+<div class="card">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/7/71/Pencil_icon.svg" alt="Dibujo" />
+  <div class="text">3 Me encanta el dibujo.</div>
+  <button onclick="playText('Me encanta el dibujo.')">🔊 Escuchar</button>
+</div>
+
+<div class="card">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/3/33/Cat_icon.svg" alt="Animales" />
+  <div class="text">4 Me flipan los animales.</div>
+  <button onclick="playText('Me flipan los animales.')">🔊 Escuchar</button>
+</div>
+
+<div class="card">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/1/13/Film_camera_icon.svg" alt="Cine" />
+  <div class="text">5 Me mola el cine.</div>
+  <button onclick="playText('Me mola el cine.')">🔊 Escuchar</button>
+</div>
+
+<div class="card">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/f/f4/Comic_icon.svg" alt="Cómics" />
+  <div class="text">6 Me gustan los cómics.</div>
+  <button onclick="playText('Me gustan los cómics.')">🔊 Escuchar</button>
+</div>
+
+<script>
+  function playText(text) {
+    if ('speechSynthesis' in window) {
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.lang = 'es-ES';
+      speechSynthesis.cancel();
+      speechSynthesis.speak(utter);
+    } else {
+      alert('TTS no este suportat.');
+    }
+  }
+</script>
+
+</body>
+</html>
