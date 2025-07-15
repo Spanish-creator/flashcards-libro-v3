@@ -55,3 +55,461 @@
   }
   .flashcard {
     background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px #aaa;
+    padding: 10px;
+    position: relative;
+  }
+  .flashcard img {
+    width: 100%;
+    height: 120px;
+    object-fit: contain;
+    margin-bottom: 6px;
+  }
+  .flashcard-text {
+    background: #fff4e1;
+    padding: 6px 8px;
+    font-size: 1em;
+    border-radius: 4px;
+    min-height: 38px;
+    user-select: none;
+  }
+  .flashcard .audio-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: #0084ff;
+    border: none;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    color: white;
+    cursor: pointer;
+    font-size: 18px;
+    line-height: 28px;
+  }
+  .flashcard .zoom-btn {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    background: #444;
+    border: none;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    color: white;
+    cursor: pointer;
+    font-size: 20px;
+    line-height: 28px;
+  }
+
+  /* === SLIDESHOW === */
+  .slideshow {
+    text-align: center;
+    position: relative;
+  }
+  .slide-image {
+    max-width: 100%;
+    max-height: 300px;
+    border-radius: 8px;
+    box-shadow: 0 0 8px #888;
+    background: white;
+  }
+  .slider-container {
+    margin: 20px 0 0 0;
+  }
+  input[type=range] {
+    width: 70%;
+  }
+  .slider-labels {
+    display: flex;
+    justify-content: space-between;
+    font-weight: bold;
+    margin-top: 4px;
+    font-size: 0.9em;
+  }
+  .controls {
+    margin-top: 12px;
+  }
+  .controls button {
+    background: #0084ff;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 5px;
+    color: white;
+    cursor: pointer;
+    margin: 0 6px;
+    font-size: 1em;
+  }
+  .controls button:disabled {
+    background: #bbb;
+    cursor: not-allowed;
+  }
+
+  /* === REVEAL IMAGE === */
+  .reveal-container {
+    max-width: 640px;
+    margin: 0 auto;
+    background: black;
+    border-radius: 8px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 0 12px #333;
+  }
+  .reveal-image {
+    width: 100%;
+    height: 360px;
+    object-fit: contain;
+    display: block;
+    filter: brightness(0) contrast(0);
+    transition: filter 0.4s ease;
+  }
+  .magnifier {
+    position: absolute;
+    width: 80px;
+    height: 80px;
+    border: 5px solid #ddd;
+    border-radius: 50%;
+    pointer-events: none;
+    box-shadow: 0 0 12px #fff;
+    background-repeat: no-repeat;
+    background-size: 640px 360px;
+    display: none;
+    cursor: crosshair;
+  }
+  .reveal-text-bar {
+    background: linear-gradient(90deg, #ff8c00, #ffb84d);
+    color: white;
+    font-weight: bold;
+    font-size: 1.2em;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .reveal-text-bar button {
+    background: #0077cc;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 5px;
+    color: white;
+    cursor: pointer;
+    font-size: 1em;
+  }
+
+  /* General */
+  .hidden {
+    display: none !important;
+  }
+
+</style>
+</head>
+<body>
+<header>Flashcards Libro V3 - Actividades integradas</header>
+
+<nav>
+  <button id="tab-flashcards" class="active">Flashcards</button>
+  <button id="tab-slideshow">Slideshow</button>
+  <button id="tab-reveal">Reveal Imagen</button>
+</nav>
+
+<!-- FLASHCARDS -->
+<section id="section-flashcards">
+  <div class="flashcards-container" id="flashcards-container">
+    <!-- Flashcards generadas por JS -->
+  </div>
+  <div style="margin-top: 20px; text-align:center;">
+    <label><input type="checkbox" id="hide-words" /> Hide words</label>
+    <label style="margin-left: 20px;"><input type="checkbox" id="hide-images" /> Hide images</label>
+  </div>
+</section>
+
+<!-- SLIDESHOW -->
+<section id="section-slideshow" class="hidden">
+  <div class="slideshow">
+    <img id="slide-img" class="slide-image" src="" alt="Imagen slideshow" />
+  </div>
+  <div class="slider-container">
+    <input type="range" min="500" max="4000" step="100" id="speed-range" value="1500" />
+    <div class="slider-labels">
+      <span>1/2 velocidad</span>
+      <span>Velocidad normal</span>
+      <span>Velocidad x2</span>
+    </div>
+  </div>
+  <div class="controls">
+    <button id="btn-start-slideshow">Start</button>
+    <button id="btn-stop-slideshow" disabled>Stop</button>
+    <button id="btn-reshuffle">Reshuffle images</button>
+  </div>
+</section>
+
+<!-- REVEAL IMAGE -->
+<section id="section-reveal" class="hidden">
+  <div class="reveal-container" id="reveal-container">
+    <img id="reveal-image" class="reveal-image" src="" alt="Imagen para revelar" />
+    <div id="magnifier" class="magnifier"></div>
+  </div>
+  <div class="reveal-text-bar">
+    <span id="reveal-text"></span>
+    <button id="btn-slow-reveal">Switch to Slow reveal</button>
+    <button id="btn-show-image" style="margin-left:10px;">Show image</button>
+    <button id="btn-play-audio" style="margin-left:10px;">🔊</button>
+  </div>
+</section>
+
+<script>
+  /* ========== Datos de las 3 actividades: ================= */
+  const flashcardsData = [
+    {
+      text: "Me chifla el deporte.",
+      img: "https://cdn-icons-png.flaticon.com/512/2604/2604594.png"
+    },
+    {
+      text: "Me gustan las artes marciales.",
+      img: "https://cdn-icons-png.flaticon.com/512/3753/3753790.png"
+    },
+    {
+      text: "Me encanta el dibujo.",
+      img: "https://cdn-icons-png.flaticon.com/512/4215/4215447.png"
+    },
+    {
+      text: "Me flipan los animales.",
+      img: "https://cdn-icons-png.flaticon.com/512/616/616408.png"
+    },
+    {
+      text: "Me mola el cine.",
+      img: "https://cdn-icons-png.flaticon.com/512/814/814096.png"
+    },
+    {
+      text: "Me gustan los cómics.",
+      img: "https://cdn-icons-png.flaticon.com/512/807/807413.png"
+    }
+  ];
+
+  const slideshowImages = [
+    "https://cdn-icons-png.flaticon.com/512/2604/2604594.png",
+    "https://cdn-icons-png.flaticon.com/512/3753/3753790.png",
+    "https://cdn-icons-png.flaticon.com/512/4215/4215447.png",
+    "https://cdn-icons-png.flaticon.com/512/616/616408.png",
+    "https://cdn-icons-png.flaticon.com/512/814/814096.png",
+    "https://cdn-icons-png.flaticon.com/512/807/807413.png"
+  ];
+
+  const revealData = {
+    img: "https://cdn-icons-png.flaticon.com/512/807/807413.png",
+    text: "Me gustan los cómics."
+  };
+
+  /* ========== TAB NAVIGATION =============== */
+  const tabs = {
+    flashcards: document.getElementById('tab-flashcards'),
+    slideshow: document.getElementById('tab-slideshow'),
+    reveal: document.getElementById('tab-reveal'),
+  };
+  const sections = {
+    flashcards: document.getElementById('section-flashcards'),
+    slideshow: document.getElementById('section-slideshow'),
+    reveal: document.getElementById('section-reveal'),
+  };
+  function switchTab(tabName) {
+    Object.keys(sections).forEach(key => {
+      if (key === tabName) {
+        sections[key].classList.remove('hidden');
+        tabs[key].classList.add('active');
+      } else {
+        sections[key].classList.add('hidden');
+        tabs[key].classList.remove('active');
+      }
+    });
+  }
+  tabs.flashcards.addEventListener('click', () => switchTab('flashcards'));
+  tabs.slideshow.addEventListener('click', () => switchTab('slideshow'));
+  tabs.reveal.addEventListener('click', () => switchTab('reveal'));
+
+  /* ========== FLASHCARDS =================== */
+  const flashcardsContainer = document.getElementById('flashcards-container');
+  const hideWordsCheckbox = document.getElementById('hide-words');
+  const hideImagesCheckbox = document.getElementById('hide-images');
+
+  function createFlashcard(card, index) {
+    const cardDiv = document.createElement('div');
+    cardDiv.className = 'flashcard';
+
+    const img = document.createElement('img');
+    img.src = card.img;
+    img.alt = `Imagen ${index + 1}`;
+    cardDiv.appendChild(img);
+
+    const textDiv = document.createElement('div');
+    textDiv.className = 'flashcard-text';
+    textDiv.textContent = card.text;
+    cardDiv.appendChild(textDiv);
+
+    // Audio button
+    const audioBtn = document.createElement('button');
+    audioBtn.className = 'audio-btn';
+    audioBtn.title = "Escuchar audio";
+    audioBtn.innerHTML = '🔊';
+    audioBtn.addEventListener('click', () => {
+      speakText(card.text);
+    });
+    cardDiv.appendChild(audioBtn);
+
+    // Zoom button
+    const zoomBtn = document.createElement('button');
+    zoomBtn.className = 'zoom-btn';
+    zoomBtn.title = "Ampliar imagen";
+    zoomBtn.innerHTML = '🔍';
+    zoomBtn.addEventListener('click', () => {
+      window.open(card.img, '_blank');
+    });
+    cardDiv.appendChild(zoomBtn);
+
+    return cardDiv;
+  }
+
+  function renderFlashcards() {
+    flashcardsContainer.innerHTML = '';
+    flashcardsData.forEach((card, i) => {
+      const flashcard = createFlashcard(card, i);
+      flashcardsContainer.appendChild(flashcard);
+    });
+    applyHideOptions();
+  }
+  function applyHideOptions() {
+    const cards = flashcardsContainer.querySelectorAll('.flashcard');
+    cards.forEach((card, idx) => {
+      const img = card.querySelector('img');
+      const text = card.querySelector('.flashcard-text');
+      img.style.display = hideImagesCheckbox.checked ? 'none' : '';
+      text.style.visibility = hideWordsCheckbox.checked ? 'hidden' : 'visible';
+    });
+  }
+  hideWordsCheckbox.addEventListener('change', applyHideOptions);
+  hideImagesCheckbox.addEventListener('change', applyHideOptions);
+  renderFlashcards();
+
+  /* ========== SPEECH SYNTHESIS =============== */
+  function speakText(text) {
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel(); // Cancel previous
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'es-ES'; // Spanish Spain
+      window.speechSynthesis.speak(utterance);
+    } else {
+      alert("Tu navegador no soporta síntesis de voz.");
+    }
+  }
+
+  /* ========== SLIDESHOW ====================== */
+  const slideImg = document.getElementById('slide-img');
+  const speedRange = document.getElementById('speed-range');
+  const btnStart = document.getElementById('btn-start-slideshow');
+  const btnStop = document.getElementById('btn-stop-slideshow');
+  const btnReshuffle = document.getElementById('btn-reshuffle');
+
+  let slideIndex = 0;
+  let slideInterval = null;
+  let currentSpeed = parseInt(speedRange.value);
+
+  function showSlide(index) {
+    slideImg.src = slideshowImages[index];
+  }
+  function nextSlide() {
+    slideIndex = (slideIndex + 1) % slideshowImages.length;
+    showSlide(slideIndex);
+  }
+  function startSlideshow() {
+    btnStart.disabled = true;
+    btnStop.disabled = false;
+    slideInterval = setInterval(nextSlide, currentSpeed);
+  }
+  function stopSlideshow() {
+    btnStart.disabled = false;
+    btnStop.disabled = true;
+    clearInterval(slideInterval);
+    slideInterval = null;
+  }
+  speedRange.addEventListener('input', () => {
+    currentSpeed = parseInt(speedRange.value);
+    if (slideInterval) {
+      clearInterval(slideInterval);
+      slideInterval = setInterval(nextSlide, currentSpeed);
+    }
+  });
+  btnStart.addEventListener('click', () => {
+    if (!slideInterval) startSlideshow();
+  });
+  btnStop.addEventListener('click', () => {
+    stopSlideshow();
+  });
+  btnReshuffle.addEventListener('click', () => {
+    shuffleArray(slideshowImages);
+    slideIndex = 0;
+    showSlide(slideIndex);
+  });
+
+  // Inicial
+  shuffleArray(slideshowImages);
+  showSlide(slideIndex);
+
+  /* Utility: Fisher-Yates shuffle */
+  function shuffleArray(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+  }
+
+  /* ========== REVEAL IMAGE =================== */
+  const revealImage = document.getElementById('reveal-image');
+  const revealText = document.getElementById('reveal-text');
+  const btnSlowReveal = document.getElementById('btn-slow-reveal');
+  const btnShowImage = document.getElementById('btn-show-image');
+  const btnPlayAudio = document.getElementById('btn-play-audio');
+  const magnifier = document.getElementById('magnifier');
+  const revealContainer = document.getElementById('reveal-container');
+
+  let slowRevealOn = false;
+
+  // Setup reveal image and text
+  revealImage.src = revealData.img;
+  revealText.textContent = revealData.text;
+
+  btnPlayAudio.addEventListener('click', () => {
+    speakText(revealData.text);
+  });
+
+  btnShowImage.addEventListener('click', () => {
+    revealImage.style.filter = "brightness(1) contrast(1)";
+    magnifier.style.display = "none";
+  });
+
+  btnSlowReveal.addEventListener('click', () => {
+    slowRevealOn = !slowRevealOn;
+    if (slowRevealOn) {
+      btnSlowReveal.textContent = "Switch to Normal reveal";
+      revealImage.style.filter = "brightness(0.2) contrast(0.2)";
+      magnifier.style.display = "block";
+    } else {
+      btnSlowReveal.textContent = "Switch to Slow reveal";
+      revealImage.style.filter = "brightness(1) contrast(1)";
+      magnifier.style.display = "none";
+    }
+  });
+
+  // Slow reveal magnifier
+  revealContainer.addEventListener('mousemove', (e) => {
+    if (!slowRevealOn) return;
+    const rect = revealContainer.getBoundingClientRect();
+    let x = e.clientX - rect.left;
+    let y = e.clientY - rect.top;
+    if (x < 0 || y < 0 || x > rect.width || y > rect.height) {
+      magnifier.style.display = "none";
+      return;
+    }
+    magnifier.style.display = "block";
+
+    // Position magnifier
+    const magSize = magnifier.offsetWidth /
